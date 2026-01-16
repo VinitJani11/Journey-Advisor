@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Booking - Green Journey Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+    <header class="bg-gray-900 text-white py-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-3xl font-bold text-green-400">Green Journey Advisor</h1>
+            <nav>
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="/" class="hover:text-green-400 transition duration-300 font-medium">Home</a></li>
+                    {% if user_id %}
+                    <li class="text-green-200 text-sm">Welcome, <span class="font-semibold">{{ username }}</span></li>
+                    <li><a href="/account" class="hover:text-green-400 transition duration-300 font-medium">My Account</a></li>
+                    <li><a href="/logout" class="hover:text-green-400 transition duration-300 font-medium">Logout</a></li>
+                    {% else %}
+                    <li><a href="/login" class="hover:text-green-400 transition duration-300 font-medium">Login</a></li>
+                    <li><a href="/register" class="hover:text-green-400 transition duration-300 font-medium">Register</a></li>
+                    {% endif %}
+                    <li><a href="/help" class="hover:text-green-400 transition duration-300 font-medium">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12 flex justify-center items-center min-h-[calc(100vh-150px)]">
+        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">View Booking Details</h2>
+
+            {% if booking %}
+            <div class="bg-blue-50 p-6 rounded-lg shadow-inner text-left mb-8 border-l-4 border-blue-400">
+                <p class="text-lg font-bold text-gray-800 mb-2">Reference: <span class="text-blue-600">{{ booking.transaction_id if booking.transaction_id else 'N/A' }}</span></p>
+                <p class="text-gray-700 mb-1">Route: <span class="font-medium">{{ booking.origin }} to {{ booking.destination }}</span></p>
+                <p class="text-gray-700 mb-1">Mode: <span class="font-medium">{{ booking.mode }}</span></p>
+                <p class="text-gray-700 mb-1">Departure Date: <span class="font-medium">{{ booking.booking_date.strftime('%d %b %Y') }}</span></p>
+                <p class="text-gray-700 mb-1">Passengers: <span class="font-medium">{{ booking.passengers }}</span></p>
+                <p class="text-gray-700 mb-1">Total Price: <span class="font-medium">£{{ '%.2f' | format(booking.total_price) }}</span></p>
+                <p class="text-gray-700 mb-1">Est. CO2: <span class="font-medium text-green-700">{{ '%.2f' | format(booking.carbon_footprint) }}kg</span></p>
+                <p class="text-gray-700 mb-1">Duration: <span class="font-medium">{{ booking.duration }}</span></p>
+                <p class="text-gray-700 mb-1">Description: <span class="font-medium">{{ booking.journey_description }}</span></p>
+                
+                {# These fields are always available when fetching from the database #}
+                <p class="text-gray-700 mb-1">Payment Method: <span class="font-medium">{{ booking.payment_method.replace('-', ' ').title() }}</span></p>
+                <p class="text-gray-700 mb-1">Status: <span class="font-medium">{{ booking.payment_status.capitalize() }}</span></p>
+                
+                <p class="text-sm text-gray-500 mt-4">Booked on: {{ booking.booked_at.strftime('%d %b %Y %H:%M') if booking.booked_at else 'N/A' }}</p>
+            </div>
+            <div class="text-center mt-8">
+                <a href="/account"
+                   class="bg-gray-300 text-gray-800 py-2 px-5 rounded-lg font-semibold hover:bg-gray-400 transition duration-300">
+                    Back to My Account
+                </a>
+            </div>
+            {% else %}
+            <p class="text-lg text-gray-600 text-center">Booking details not found.</p>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-6 mt-12">
+        <div class="container mx-auto text-center px-4">
+            <p class="text-sm">&copy; 2025 Green Journey Advisor. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

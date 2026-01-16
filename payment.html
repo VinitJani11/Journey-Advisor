@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Green Journey Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .btn-gradient {
+            background-image: linear-gradient(to right, #22c55e, #10b981); /* Green to lighter green */
+        }
+        .btn-gradient:hover {
+            background-image: linear-gradient(to right, #10b981, #22c55e); /* Reverse gradient on hover */
+        }
+        /* Custom focus styles for inputs */
+        .input-focus-green:focus {
+            outline: none;
+            border-color: #10b981; /* green-500 */
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.4); /* green-500 with opacity */
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-fadeIn-delay-1 { animation-delay: 0.1s; }
+        .animate-fadeIn-delay-2 { animation-delay: 0.2s; }
+        .animate-fadeIn-delay-3 { animation-delay: 0.3s; }
+        .animate-fadeIn-delay-4 { animation-delay: 0.4s; }
+        .animate-fadeIn-delay-5 { animation-delay: 0.5s; }
+
+        @keyframes slideInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideInUp {
+            animation: slideInUp 0.7s ease-out forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+    <header class="bg-gray-900 text-white py-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-3xl font-bold text-green-400">Green Journey Advisor</h1>
+            <nav>
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="/" class="hover:text-green-400 transition duration-300 font-medium">Home</a></li>
+                    {% if user_id %}
+                    <li class="text-green-200 text-sm">Welcome, <span class="font-semibold">{{ username }}</span></li>
+                    <li><a href="/account" class="hover:text-green-400 transition duration-300 font-medium">My Account</a></li>
+                    <li><a href="/logout" class="hover:text-green-400 transition duration-300 font-medium">Logout</a></li>
+                    {% else %}
+                    <li><a href="/login" class="hover:text-green-400 transition duration-300 font-medium">Login</a></li>
+                    <li><a href="/register" class="hover:text-green-400 transition duration-300 font-medium">Register</a></li>
+                    {% endif %}
+                    <li><a href="/help" class="hover:text-green-400 transition duration-300 font-medium">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12 flex justify-center items-center min-h-[calc(100vh-150px)]">
+        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl animate-slideInUp">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center animate-fadeIn animate-fadeIn-delay-1">Complete Your Payment</h2>
+
+            <div class="flex items-center justify-center mb-8 animate-fadeIn animate-fadeIn-delay-2">
+                <span class="text-gray-400 text-lg">1. Details</span>
+                <span class="mx-4 text-gray-400">→</span>
+                <span class="text-blue-600 font-semibold text-lg">2. Payment</span>
+                <span class="mx-4 text-gray-400">→</span>
+                <span class="text-gray-400 text-lg">3. Confirmation</span>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="mb-4 animate-fadeIn animate-fadeIn-delay-3">
+                        {% for category, message in messages %}
+                            <div class="p-3 rounded-md text-sm {% if category == 'error' %}bg-red-100 text-red-700{% elif category == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="order-summary bg-blue-50 p-6 rounded-lg shadow-inner border-l-4 border-blue-400 animate-fadeIn animate-fadeIn-delay-4">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-4">Order Summary</h3>
+                    {% if journey %}
+                    <p class="text-lg font-medium text-gray-700 mb-2">{{ journey.origin }} to {{ journey.destination }}</p>
+                    <p class="text-gray-600 mb-1">Mode: <span class="font-medium">{{ journey.mode }}</span></p>
+                    <p class="text-gray-600 mb-1">Departure: <span class="font-medium">{{ journey.departure_date }}</span></p>
+                    <p class="text-gray-600 mb-1">Passengers: <span class="font-medium">{{ journey.passengers }}</span></p>
+                    <p class="text-gray-600 mb-1">Est. CO2: <span class="font-medium text-green-700">{{ '%.2f' | format(journey.carbon_footprint) }}kg</span></p>
+                    <p class="text-3xl font-bold text-green-700 mt-4">Total: £{{ '%.2f' | format(journey.price * journey.passengers) }}</p>
+                    {% else %}
+                    <p class="text-gray-600">No journey details available.</p>
+                    {% endif %}
+                </div>
+
+                <div class="payment-form bg-gray-50 p-6 rounded-lg shadow-inner animate-fadeIn animate-fadeIn-delay-5">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Payment Information</h3>
+                    <div class="flex justify-center gap-4 mb-4 text-3xl">
+                        <span>💳</span> <!-- Generic Card Icon -->
+                        <span>Visa</span> <!-- Visa Icon/Text -->
+                        <span>Mastercard</span> <!-- Mastercard Icon/Text -->
+                        <!-- You can replace these with actual SVG icons for better fidelity -->
+                    </div>
+                    <form action="/payment" method="post" class="space-y-4">
+                        <div>
+                            <label for="card_number" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                            <input type="text" id="card_number" name="card_number" required placeholder="XXXX XXXX XXXX XXXX"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus-green">
+                            <p class="text-xs text-gray-500 mt-1">Enter a 13-16 digit number (e.g., 1111222233334444)</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <div class="w-full sm:w-1/2">
+                                <label for="expiry_date" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date (MM/YY)</label>
+                                <input type="text" id="expiry_date" name="expiry_date" required placeholder="MM/YY"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus-green">
+                                <p class="text-xs text-gray-500 mt-1">e.g., 12/28</p>
+                            </div>
+                            <div class="w-full sm:w-1/2">
+                                <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                                <input type="text" id="cvv" name="cvv" required placeholder="XXX"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus-green">
+                                <p class="text-xs text-gray-500 mt-1">3 or 4 digits</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="cardholder_name" class="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
+                            <input type="text" id="cardholder_name" name="cardholder_name" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus-green"
+                                   placeholder="Name on card">
+                        </div>
+                        <p class="text-sm text-gray-500 text-center mt-4">
+                            <span class="text-green-600 font-semibold">Your payment is simulated for this project.</span> No real transaction will occur.
+                        </p>
+                        <button type="submit"
+                                class="w-full btn-gradient text-white py-3 px-6 rounded-lg font-semibold text-lg
+                                       shadow-md transform hover:scale-105 transition duration-300 ease-in-out mt-6">
+                            Complete Booking & Pay
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <p class="text-center text-gray-600 text-sm mt-8 flex items-center justify-center gap-2 animate-fadeIn animate-fadeIn-delay-6">
+                <span class="text-green-600 text-xl">🔒</span> Your information is securely processed.
+            </p>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-6 mt-12">
+        <div class="container mx-auto text-center px-4">
+            <p class="text-sm">&copy; 2025 Green Journey Advisor. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

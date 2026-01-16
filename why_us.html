@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Choose Us? - Green Journey Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInDown {
+            animation: fadeInDown 0.7s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-fadeInDown:nth-child(1) { animation-delay: 0.2s; }
+        .animate-fadeInDown:nth-child(2) { animation-delay: 0.4s; }
+
+        @keyframes zoomIn {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-zoomIn {
+            animation: zoomIn 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-zoomIn:nth-child(1) { animation-delay: 0.3s; }
+        .animate-zoomIn:nth-child(2) { animation-delay: 0.5s; }
+        .animate-zoomIn:nth-child(3) { animation-delay: 0.7s; }
+        .animate-zoomIn:nth-child(4) { animation-delay: 0.9s; }
+
+        /* General Fade In for content sections */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-fadeIn-delay-1 { animation-delay: 0.1s; }
+        .animate-fadeIn-delay-2 { animation-delay: 0.2s; }
+        .animate-fadeIn-delay-3 { animation-delay: 0.3s; }
+        .animate-fadeIn-delay-4 { animation-delay: 0.4s; }
+        .animate-fadeIn-delay-5 { animation-delay: 0.5s; }
+
+        /* Desktop navigation - Always show desktop nav */
+        .desktop-nav {
+            display: flex !important;
+        }
+        /* Hide hamburger and mobile menu elements */
+        .hamburger, .mobile-menu-overlay, .mobile-menu {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+    <header class="bg-gray-900 text-white py-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-3xl font-bold text-green-400">Green Journey Advisor</h1>
+            
+            <nav class="desktop-nav">
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="/" class="hover:text-green-400 transition duration-300 font-medium">Home</a></li>
+                    <li><a href="/about" class="hover:text-green-400 transition duration-300 font-medium">About Us</a></li>
+                    <li><a href="/why_us" class="hover:text-green-400 transition duration-300 font-medium">Why Us</a></li>
+                    <li><a href="/help" class="hover:text-green-400 transition duration-300 font-medium">Help</a></li>
+                    {% if user_id %}
+                    <li class="text-green-200 text-sm">Welcome, <span class="font-semibold">{{ username }}</span></li>
+                    <li><a href="/account" class="hover:text-green-400 transition duration-300 font-medium">My Account</a></li>
+                    <li><a href="/logout" class="hover:text-green-400 transition duration-300 font-medium">Logout</a></li>
+                    {% else %}
+                    <li><a href="/login" class="hover:text-green-400 transition duration-300 font-medium">Login</a></li>
+                    <li><a href="/register" class="hover:text-green-400 transition duration-300 font-medium">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12">
+        <div class="bg-white p-8 rounded-xl shadow-lg animate-fadeInDown">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 animate-fadeIn animate-fadeIn-delay-1">Why Choose Green Journey Advisor?</h2>
+            <p class="text-gray-600 mb-4 animate-fadeIn animate-fadeIn-delay-2">
+                At Green Journey Advisor, we are dedicated to making your travel not just efficient and affordable,
+                but also genuinely sustainable. Here's why we stand out:
+            </p>
+        </div>
+
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-zoomIn">
+                <div class="text-5xl text-green-600 mb-4">🍃</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Real CO2 Savings</h3>
+                <p class="text-gray-600">
+                    We provide transparent CO2 emission data for each journey, helping you choose the most
+                    eco-friendly options and track your positive environmental impact.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-zoomIn" style="animation-delay: 0.2s;">
+                <div class="text-5xl text-blue-600 mb-4">💰</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Cost-Effective Travel</h3>
+                <p class="text-gray-600">
+                    Our smart search engine finds the best deals on green transport, ensuring you save money
+                    while traveling responsibly. Look out for exclusive student discounts!
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-zoomIn" style="animation-delay: 0.4s;">
+                <div class="text-5xl text-purple-600 mb-4">⏱️</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Efficiency & Convenience</h3>
+                <p class="text-gray-600">
+                    We prioritize efficient routes and seamless booking processes, making sustainable travel
+                    as convenient as possible. Save time planning and enjoy your journey.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-zoomIn" style="animation-delay: 0.6s;">
+                <div class="text-5xl text-yellow-600 mb-4">🎓</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Student-Friendly</h3>
+                <p class="text-gray-600">
+                    Special discounts and tailored options for students make green travel even more accessible.
+                    We support the next generation of eco-conscious travelers.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-zoomIn" style="animation-delay: 0.8s;">
+                <div class="text-5xl text-red-600 mb-4">🔒</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Secure & Reliable</h3>
+                <p class="text-gray-600">
+                    Your data and payment information are handled with the highest security standards.
+                    Travel with peace of mind knowing you're in safe hands.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-zoomIn" style="animation-delay: 1s;">
+                <div class="text-5xl text-teal-600 mb-4">🤝</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Dedicated Support</h3>
+                <p class="text-gray-600">
+                    Our friendly support team is always here to help you with any queries or issues,
+                    ensuring a smooth and enjoyable experience from start to finish.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-6 mt-12">
+        <div class="container mx-auto text-center px-4">
+            <p class="text-sm">&copy; 2025 Green Journey Advisor. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Removed all mobile menu toggle functionality as requested.
+        // The desktop navigation is now always visible.
+    </script>
+</body>
+</html>

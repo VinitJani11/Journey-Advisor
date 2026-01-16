@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Journey Advisor</title>
+    <!-- Tailwind CSS CDN for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom CSS for any specific overrides or fonts -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Custom font for a professional look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom gradient for buttons */
+        .btn-gradient {
+            background-image: linear-gradient(to right, #22c55e, #10b981); /* Green to lighter green */
+        }
+        .btn-gradient:hover {
+            background-image: linear-gradient(to right, #10b981, #22c55e); /* Reverse gradient on hover */
+        }
+        /* Hero background image */
+        .hero-bg {
+            /* Updated background image for the hero section */
+            background-image: url('https://placehold.co/1920x800/66cdaa/ffffff?text=Sustainable+Travel+UK+Landscape');
+            background-size: 110% 110%; /* Start slightly zoomed in for animation */
+            background-position: center;
+            position: relative;
+            z-index: 0;
+            min-height: 600px; /* Ensure hero section has enough height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Hide overflow from background animation */
+            animation: backgroundPanZoom 20s ease-in-out infinite alternate; /* Subtle background animation */
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4); /* Dark overlay for text readability - adjusted opacity */
+            z-index: -1; /* Puts it behind the content but above the background image */
+        }
+
+        /* Animations */
+        @keyframes fadeInSlideUpBlur {
+            0% { opacity: 0; transform: translateY(40px) scale(0.95) blur(5px); }
+            100% { opacity: 1; transform: translateY(0) scale(1) blur(0); }
+        }
+        .animate-fadeInSlideUpBlur {
+            animation: fadeInSlideUpBlur 1s ease-out forwards;
+            opacity: 0; /* Start hidden */
+        }
+        .animate-fadeInSlideUpBlur:nth-child(1) { animation-delay: 0.2s; } /* H2 */
+        .animate-fadeInSlideUpBlur:nth-child(2) { animation-delay: 0.4s; } /* P */
+        .animate-fadeInSlideUpBlur:nth-child(3) { animation-delay: 0.6s; } /* Search Module */
+
+        @keyframes backgroundPanZoom {
+            0% { background-size: 110% 110%; background-position: 50% 50%; }
+            100% { background-size: 100% 100%; background-position: 51% 51%; }
+        }
+
+        @keyframes popRotateIcon {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        .group:hover .group-icon-animate {
+            animation: popRotateIcon 0.6s ease-in-out;
+        }
+
+        /* Enhanced Feature Card Hover Effect */
+        .feature-item {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Stronger initial shadow */
+            flex: 1;
+            min-width: 280px;
+            max-width: 350px;
+            text-align: center;
+            transition: all 0.3s ease-in-out; /* Smooth transition for all properties */
+            transform: translateY(0); /* Ensure initial state for hover */
+        }
+        .feature-item:hover {
+            transform: translateY(-8px) scale(1.03); /* More pronounced lift and scale */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 0 5px rgba(34, 197, 94, 0.2); /* Larger, colored shadow */
+        }
+
+        /* Custom focus styles for inputs */
+        .input-focus-green:focus {
+            outline: none;
+            border-color: #10b981; /* green-500 */
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.4); /* green-500 with opacity */
+        }
+
+        /* Hamburger menu icon animation */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            z-index: 50; /* Ensure it's above other content */
+        }
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            border-radius: 2px;
+            transition: all 0.3s ease-in-out;
+        }
+        .hamburger.open span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.open span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        /* Mobile menu overlay */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 40;
+            display: none; /* Hidden by default */
+        }
+
+        /* Mobile menu sidebar */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px; /* Start off-screen */
+            width: 250px;
+            height: 100%;
+            background-color: #2c3e50; /* Dark blue */
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+            z-index: 45;
+            transition: right 0.3s ease-in-out;
+            padding-top: 60px; /* Space for header */
+        }
+        .mobile-menu.open {
+            right: 0; /* Slide in */
+        }
+        .mobile-menu ul li a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+        .mobile-menu ul li a:hover {
+            background-color: #34495e; /* Darker blue on hover */
+        }
+        .mobile-menu ul li.welcome-text {
+            padding: 15px 20px;
+            color: #d1d5db; /* Light gray */
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+
+        /* Desktop navigation */
+        @media (min-width: 768px) {
+            .hamburger {
+                display: none; /* Hide hamburger on desktop */
+            }
+            .desktop-nav {
+                display: flex !important; /* Always show desktop nav */
+            }
+            .mobile-menu-overlay, .mobile-menu {
+                display: none !important; /* Hide mobile menu elements */
+            }
+        }
+        @media (max-width: 767px) {
+            .desktop-nav {
+                display: none; /* Hide desktop nav on mobile */
+            }
+        }
+
+        /* Image Slider Specific Styles */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px; /* Max width for the slider */
+            height: 450px; /* Adjusted height for the slider images */
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin: 4rem auto; /* Center with margin */
+        }
+
+        .slider-wrapper {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s ease-in-out; /* Smooth slide transition */
+        }
+
+        .slider-slide {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            position: relative; /* Needed for overlay */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem; /* Base font size */
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8); /* Stronger shadow for contrast */
+            -webkit-text-stroke: 1px black; /* Text stroke for better readability */
+            text-stroke: 1px black; /* Standard property */
+            border-radius: 12px; /* Match container border-radius */
+        }
+
+        /* Overlay for slider text readability */
+        .slider-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4); /* Slightly darker overlay for better contrast */
+            z-index: 1; /* Above image, below text */
+        }
+
+        .slider-slide span {
+            position: relative;
+            z-index: 2; /* Ensure text is above overlay */
+            font-size: 3rem; /* Increased font size for more impact */
+            line-height: 1.2; /* Adjust line height if needed */
+            text-align: center;
+            padding: 0 20px; /* Add some padding to prevent text from touching edges */
+        }
+
+        /* Specific background images for slider slides */
+        .slider-slide.slide-1 {
+            background-image: url('https://lh3.googleusercontent.com/gps-cs-s/AC9h4npCUMtXpl2dkEK25cZIToe73LwMMfrVTM7tMkSzp3K0lasAl07kEoVRNc91FfhfiWpeMBYu59wzYWeLRKOIUY14BaX4fXNhaBqTZYMVER7YyjQA9IaYvJdlj_m-9rarz1zzbiQ=w540-h312-n-k-no');
+        }
+        .slider-slide.slide-2 {
+            background-image: url('https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcTUZfULNJAKWoQXQYzgVwiHzMAtR8Ru10nLn1r6mBBpPeAhrJvmSUvvBv2snReZ3WW5vmqeqSwmf3cR97We6ZGGo9zMZanCVQogxZ0IIw');
+        }
+        .slider-slide.slide-3 {
+            background-image: url('https://lh3.googleusercontent.com/gps-cs-s/AC9h4noFUzOuN9e1oHz5S9anz_l0G0R1pCpE5q3nGUh-KorxtsUKkTGK4x3f_-PaEUL4O7kjOaWFTpQFBwtnokljy_wCC32UBT2Tl3c6jraUrQMJA3PERzhwvAC8yFjwELnzgRHGI8s=w540-h312-n-k-no');
+        }
+        .slider-slide.slide-4 {
+            background-image: url('https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcRT2qNvnWU6g6fTjxhHe9V0rE6RpMDpaYjtm8M26SOsrlKIarNA-Q_p1i7jpEDZoZh0bmv6EA82ix3tIVSljsxmQcze0pk9KisJ3N0Xdg');
+        }
+
+        .slider-nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 1rem 1.2rem;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+        .slider-nav-button:hover {
+            background-color: rgba(0,0,0,0.7);
+        }
+        .slider-nav-button.prev {
+            left: 1rem;
+        }
+        .slider-nav-button.next {
+            right: 1rem;
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            background-color: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .slider-dot.active {
+            background-color: white;
+            transform: scale(1.2);
+        }
+
+        /* General Fade In for content sections */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-fadeIn-delay-1 { animation-delay: 0.1s; }
+        .animate-fadeIn-delay-2 { animation-delay: 0.2s; }
+        .animate-fadeIn-delay-3 { animation-delay: 0.3s; }
+        .animate-fadeIn-delay-4 { animation-delay: 0.4s; }
+        .animate-fadeIn-delay-5 { animation-delay: 0.5s; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+    <header class="bg-gray-900 text-white py-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-3xl font-bold text-green-400">Green Journey Advisor</h1>
+            
+            <!-- Desktop Navigation -->
+            <nav class="desktop-nav hidden md:flex">
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="/" class="hover:text-green-400 transition duration-300 font-medium">Home</a></li>
+                    <li><a href="/about" class="hover:text-green-400 transition duration-300 font-medium">About Us</a></li>
+                    <li><a href="/why_us" class="hover:text-green-400 transition duration-300 font-medium">Why Us</a></li>
+                    <li><a href="/help" class="hover:text-green-400 transition duration-300 font-medium">Help</a></li>
+                    {% if user_id %}
+                    <li class="text-green-200 text-sm">Welcome, <span class="font-semibold">{{ username }}</span></li>
+                    <li><a href="/account" class="hover:text-green-400 transition duration-300 font-medium">My Account</a></li>
+                    <li><a href="/logout" class="hover:text-green-400 transition duration-300 font-medium">Logout</a></li>
+                    {% else %}
+                    <li><a href="/login" class="hover:text-green-400 transition duration-300 font-medium">Login</a></li>
+                    <li><a href="/register" class="hover:text-green-400 transition duration-300 font-medium">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+            <!-- Hamburger Icon for Mobile -->
+            <div class="md:hidden flex items-center">
+                <button id="hamburgerButton" class="hamburger focus:outline-none">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
+
+    <!-- Mobile Menu Sidebar -->
+    <div id="mobileMenu" class="mobile-menu">
+        <ul>
+            {% if user_id %}
+            <li class="welcome-text">Welcome, {{ username }}</li>
+            <li><a href="/account">My Account</a></li>
+            <li><a href="/logout">Logout</a></li>
+            {% else %}
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+            {% endif %}
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/why_us">Why Us</a></li>
+            <li><a href="/help">Help</a></li>
+        </ul>
+    </div>
+
+    <main>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container mx-auto px-4 mt-4 animate-fadeIn">
+                    {% for category, message in messages %}
+                        <div class="p-3 rounded-md text-sm {% if category == 'error' %}bg-red-100 text-red-700{% elif category == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <section class="hero-bg py-24 text-white text-center">
+            <div class="container mx-auto px-4 relative z-10">
+                <h2 class="text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-lg animate-fadeInSlideUpBlur">Plan Your <span class="text-green-400">Green Journey</span> Across the UK</h2>
+                <p class="text-xl md:text-2xl mb-10 max-w-3xl mx-auto opacity-90 animate-fadeInSlideUpBlur" style="animation-delay: 0.3s;">Find sustainable travel options saving time, money, and CO2 emissions.</p>
+
+                <!-- Search Module -->
+                <div class="bg-white p-8 rounded-xl shadow-2xl max-w-5xl mx-auto transform -translate-y-12 animate-fadeInSlideUpBlur" style="animation-delay: 0.6s;">
+                    <form id="searchForm" action="/search_results" method="post" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-end">
+                        <div class="lg:col-span-3 flex justify-center gap-4 mb-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="journey_type" value="one_way" class="form-radio text-green-600" checked>
+                                <span class="ml-2 text-gray-700 font-medium">One Way</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="journey_type" value="return" class="form-radio text-green-600">
+                                <span class="ml-2 text-gray-700 font-medium">Return Journey</span>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label for="origin" class="block text-left text-sm font-medium text-gray-700 mb-1">Origin (UK City)</label>
+                            <select id="origin" name="origin" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus-green bg-white text-gray-800">
+                                <option value="">Select Origin</option>
+                                {% for city in unique_origins %}
+                                <option value="{{ city }}">{{ city }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="destination" class="block text-left text-sm font-medium text-gray-700 mb-1">Destination (UK City)</label>
+                            <select id="destination" name="destination" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus-green bg-white text-gray-800" disabled>
+                                <option value="">Select Destination</option>
+                                {# Destinations will be loaded dynamically via JavaScript #}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="departure_date" class="block text-left text-sm font-medium text-gray-700 mb-1">Departure Date</label>
+                            <input type="date" id="departure_date" name="departure_date" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus-green bg-white text-gray-800">
+                        </div>
+                        <div id="returnDateContainer" class="hidden">
+                            <label for="return_date" class="block text-left text-sm font-medium text-gray-700 mb-1">Return Date</label>
+                            <input type="date" id="return_date" name="return_date"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus-green bg-white text-gray-800">
+                        </div>
+                        <div>
+                            <label for="passengers" class="block text-left text-sm font-medium text-gray-700 mb-1">Passengers</label>
+                            <input type="number" id="passengers" name="passengers" value="1" min="1"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus-green bg-white text-gray-800">
+                        </div>
+                        <div class="lg:col-span-1 flex items-end">
+                            <button type="submit"
+                                    class="w-full btn-gradient text-white py-3 px-6 rounded-lg font-semibold text-lg
+                                           shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
+                                Search Green Journeys
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <p class="text-orange-300 text-sm mt-6 font-medium drop-shadow-md">Students! Unlock exclusive discounts on your sustainable journeys.</p>
+            </div>
+        </section>
+
+        <!-- New Image Slider Section -->
+        <section class="container mx-auto px-4 py-12 text-center animate-fadeIn animate-fadeIn-delay-1">
+            <h3 class="text-3xl font-bold text-gray-800 mb-10">Explore Popular Green Journeys</h3>
+            <div class="slider-container">
+                <div class="slider-wrapper" id="imageSlider">
+                    <div class="slider-slide slide-1">
+                        <span class="animate-fadeInSlideUpBlur" style="animation-delay: 0.2s;">London to Edinburgh (Electric Train)</span>
+                    </div>
+                    <div class="slider-slide slide-2">
+                        <span class="animate-fadeInSlideUpBlur" style="animation-delay: 0.2s;">Manchester to Bristol (Coach)</span>
+                    </div>
+                    <div class="slider-slide slide-3">
+                        <span class="animate-fadeInSlideUpBlur" style="animation-delay: 0.2s;">Birmingham to Cardiff (Car Share)</span>
+                    </div>
+                    <div class="slider-slide slide-4">
+                        <span class="animate-fadeInSlideUpBlur" style="animation-delay: 0.2s;">Glasgow to London (Electric Train)</span>
+                    </div>
+                </div>
+                <button class="slider-nav-button prev" id="prevSlide">❮</button>
+                <button class="slider-nav-button next" id="nextSlide">❯</button>
+                <div class="slider-dots" id="sliderDots">
+                    <span class="slider-dot active" data-slide="0"></span>
+                    <span class="slider-dot" data-slide="1"></span>
+                    <span class="slider-dot" data-slide="2"></span>
+                    <span class="slider-dot" data-slide="3"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="container mx-auto px-4 py-12 text-center animate-fadeIn animate-fadeIn-delay-2">
+            <h3 class="text-3xl font-bold text-gray-800 mb-10">Why Choose Green Journey Advisor?</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-item bg-white p-8 rounded-xl shadow-lg transform hover:scale-105 transition duration-300 group">
+                    <div class="text-6xl mb-4 text-green-500 group-hover:text-green-600 transition duration-300 group-icon-animate">🍃</div>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Reduce CO2</h4>
+                    <p class="text-gray-600">Compare emissions for greener choices and track your environmental impact.</p>
+                </div>
+                <div class="feature-item bg-white p-8 rounded-xl shadow-lg transform hover:scale-105 transition duration-300 group">
+                    <div class="text-6xl mb-4 text-blue-500 group-hover:text-blue-600 transition duration-300 group-icon-animate">💰</div>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Save Money</h4>
+                    <p class="text-gray-600">Find the most cost-effective routes, including exclusive student deals.</p>
+                </div>
+                <div class="feature-item bg-white p-8 rounded-xl shadow-lg transform hover:scale-105 transition duration-300 group">
+                    <div class="text-6xl mb-4 text-purple-500 group-hover:text-purple-600 transition duration-300 group-icon-animate">⏱️</div>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Save Time</h4>
+                    <p class="text-gray-600">Discover efficient travel plans that fit your schedule.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto text-center px-4">
+            <p class="text-sm">&copy; 2025 Green Journey Advisor. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchForm = document.getElementById('searchForm');
+            const originSelect = document.getElementById('origin');
+            const destinationSelect = document.getElementById('destination');
+            const returnDateContainer = document.getElementById('returnDateContainer');
+            const returnDateInput = document.getElementById('return_date');
+            const journeyTypeRadios = document.querySelectorAll('input[name="journey_type"]');
+            const hamburgerButton = document.getElementById('hamburgerButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+
+            // Function to update destination options based on origin
+            async function updateDestinations() {
+                const origin = originSelect.value;
+                destinationSelect.innerHTML = '<option value="">Loading Destinations...</option>';
+                destinationSelect.disabled = true;
+
+                if (origin) {
+                    try {
+                        const response = await fetch(`/get_destinations/${origin}`);
+                        const destinations = await response.json();
+                        
+                        destinationSelect.innerHTML = '<option value="">Select Destination</option>';
+                        if (destinations.length > 0) {
+                            destinations.forEach(city => {
+                                const option = document.createElement('option');
+                                option.value = city;
+                                option.textContent = city;
+                                destinationSelect.appendChild(option);
+                            });
+                            destinationSelect.disabled = false;
+                        } else {
+                            destinationSelect.innerHTML = '<option value="">No destinations from here</option>';
+                        }
+                    } catch (error) {
+                        console.error('Error fetching destinations:', error);
+                        destinationSelect.innerHTML = '<option value="">Error loading destinations</option>';
+                    }
+                } else {
+                    destinationSelect.innerHTML = '<option value="">Select Origin First</option>';
+                }
+            }
+
+            // Event listener for origin select change
+            originSelect.addEventListener('change', updateDestinations);
+
+            // Initial call to populate destinations if an origin is pre-selected (e.g., after form submission with error)
+            if (originSelect.value) {
+                updateDestinations();
+            } else {
+                destinationSelect.innerHTML = '<option value="">Select Origin First</option>';
+            }
+
+            // Handle one-way vs. return journey toggle
+            journeyTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'return') {
+                        returnDateContainer.classList.remove('hidden');
+                        returnDateInput.setAttribute('required', 'required');
+                    } else {
+                        returnDateContainer.classList.add('hidden');
+                        returnDateInput.removeAttribute('required');
+                        returnDateInput.value = ''; // Clear return date if switching to one-way
+                    }
+                });
+            });
+
+            // Form submission validation (client-side)
+            searchForm.addEventListener('submit', function(event) {
+                if (originSelect.value === destinationSelect.value) {
+                    // Replaced alert with a custom message box or flash message if implemented
+                    // For now, keeping alert as per original, but recommend custom UI.
+                    alert('Origin and Destination cannot be the same. Please select different locations.');
+                    event.preventDefault(); // Prevent form submission
+                }
+
+                const departureDate = new Date(document.getElementById('departure_date').value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Reset time for accurate date comparison
+
+                if (departureDate < today) {
+                    // Replaced alert with a custom message box or flash message if implemented
+                    alert('Departure date cannot be in the past. Please select a future date.');
+                    event.preventDefault();
+                    return;
+                }
+
+                if (document.querySelector('input[name="journey_type"]:checked').value === 'return') {
+                    if (!returnDateInput.value) {
+                        // Replaced alert with a custom message box or flash message if implemented
+                        alert('Please select a return date for a return journey.');
+                        event.preventDefault();
+                        return;
+                    }
+                    const returnDate = new Date(returnDateInput.value);
+                    if (returnDate < departureDate) {
+                        // Replaced alert with a custom message box or flash message if implemented
+                        alert('Return date cannot be before departure date.');
+                        event.preventDefault();
+                    }
+                }
+            });
+
+            // Set min date for departure to today
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months start at 0!
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('departure_date').min = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('return_date').min = `${yyyy}-${mm}-${dd}`; // Also set for return date
+
+            // Hamburger menu toggle functionality
+            hamburgerButton.addEventListener('click', function() {
+                hamburgerButton.classList.toggle('open');
+                mobileMenu.classList.toggle('open');
+                mobileMenuOverlay.classList.toggle('hidden'); // Toggle overlay visibility
+            });
+
+            // Close mobile menu when clicking overlay
+            mobileMenuOverlay.addEventListener('click', function() {
+                hamburgerButton.classList.remove('open');
+                mobileMenu.classList.remove('open');
+                mobileMenuOverlay.classList.add('hidden');
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburgerButton.classList.remove('open');
+                    mobileMenu.classList.remove('open');
+                    mobileMenuOverlay.classList.add('hidden');
+                });
+            });
+
+            // Image Slider Functionality
+            const sliderWrapper = document.getElementById('imageSlider');
+            const prevSlideButton = document.getElementById('prevSlide');
+            const nextSlideButton = document.getElementById('nextSlide');
+            const sliderDotsContainer = document.getElementById('sliderDots');
+            const slides = document.querySelectorAll('.slider-slide');
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+            let autoSlideInterval;
+
+            function updateSlider() {
+                sliderWrapper.style.transform = `translateX(${-currentIndex * 100}%)`;
+                updateDots();
+            }
+
+            function updateDots() {
+                document.querySelectorAll('.slider-dot').forEach((dot, index) => {
+                    if (index === currentIndex) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            }
+
+            function goToSlide(index) {
+                currentIndex = index;
+                updateSlider();
+                resetAutoSlide();
+            }
+
+            prevSlideButton.addEventListener('click', () => {
+                currentIndex = (currentIndex === 0) ? totalSlides - 1 : currentIndex - 1;
+                updateSlider();
+                resetAutoSlide();
+            });
+
+            nextSlideButton.addEventListener('click', () => {
+                currentIndex = (currentIndex === totalSlides - 1) ? 0 : currentIndex + 1;
+                updateSlider();
+                resetAutoSlide();
+            });
+
+            sliderDotsContainer.addEventListener('click', (event) => {
+                if (event.target.classList.contains('slider-dot')) {
+                    const slideIndex = parseInt(event.target.dataset.slide);
+                    goToSlide(slideIndex);
+                }
+            });
+
+            function startAutoSlide() {
+                autoSlideInterval = setInterval(() => {
+                    currentIndex = (currentIndex === totalSlides - 1) ? 0 : currentIndex + 1;
+                    updateSlider();
+                }, 5000); // Change slide every 5 seconds
+            }
+
+            function resetAutoSlide() {
+                clearInterval(autoSlideInterval);
+                startAutoSlide();
+            }
+
+            // Initialize slider
+            updateSlider(); // Set initial position
+            startAutoSlide(); // Start auto-sliding
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - Green Journey Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .booking-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Added box-shadow transition */
+        }
+        .booking-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* More pronounced shadow on hover */
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px; /* pill shape */
+            font-weight: 600; /* font-semibold */
+            font-size: 0.75rem; /* text-xs */
+        }
+        .status-confirmed {
+            background-color: #d1fae5; /* green-100 */
+            color: #065f46; /* green-800 */
+        }
+        .status-completed {
+            background-color: #fef3c7; /* yellow-100 */
+            color: #92400e; /* yellow-800 */
+        }
+        .status-cancelled {
+            background-color: #fee2e2; /* red-100 */
+            color: #991b1b; /* red-800 */
+        }
+
+        .info-card-green {
+            background-image: linear-gradient(to right bottom, #d1fae5, #a7f3d0); /* Light green gradient */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .info-card-green:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        .info-card-blue {
+            background-image: linear-gradient(to right bottom, #bfdbfe, #93c5fd); /* Light blue gradient */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .info-card-blue:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        .info-card-yellow {
+            background-image: linear-gradient(to right bottom, #fef3c7, #fde68a); /* Light yellow gradient */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .info-card-yellow:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        /* Custom button styles for actions */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem; /* text-sm */
+            line-height: 1.25rem; /* leading-5 */
+            font-weight: 500; /* font-medium */
+            border-radius: 0.375rem; /* rounded-md */
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+        }
+        .btn-action:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* More pronounced shadow on hover */
+        }
+        .btn-action-primary {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+        .btn-action-primary:hover {
+            background-color: #2563eb; /* blue-600 */
+            transform: translateY(-1px);
+        }
+        .btn-action-secondary {
+            background-color: #6b7280; /* gray-500 */
+            color: white;
+        }
+        .btn-action-secondary:hover {
+            background-color: #4b5563; /* gray-600 */
+            transform: translateY(-1px);
+        }
+        .btn-action-danger {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+        }
+        .btn-action-danger:hover {
+            background-color: #dc2626; /* red-600 */
+            transform: translateY(-1px);
+        }
+        .btn-action-rebook {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+        }
+        .btn-action-rebook:hover {
+            background-color: #10b981; /* green-600 */
+            transform: translateY(-1px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-fadeIn-delay-1 { animation-delay: 0.1s; }
+        .animate-fadeIn-delay-2 { animation-delay: 0.2s; }
+        .animate-fadeIn-delay-3 { animation-delay: 0.3s; }
+        .animate-fadeIn-delay-4 { animation-delay: 0.4s; }
+        .animate-fadeIn-delay-5 { animation-delay: 0.5s; }
+        .animate-fadeIn-delay-6 { animation-delay: 0.6s; }
+
+        @keyframes slideInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideInUp {
+            animation: slideInUp 0.7s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-slideInUp-delay-1 { animation-delay: 0.1s; }
+        .animate-slideInUp-delay-2 { animation-delay: 0.2s; }
+        .animate-slideInUp-delay-3 { animation-delay: 0.3s; }
+        .animate-slideInUp-delay-4 { animation-delay: 0.4s; }
+        .animate-slideInUp-delay-5 { animation-delay: 0.5s; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+    <header class="bg-gray-900 text-white py-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-3xl font-bold text-green-400">Green Journey Advisor</h1>
+            <nav>
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="/" class="hover:text-green-400 transition duration-300 font-medium">Home</a></li>
+                    {% if user_id %}
+                    <li class="text-green-200 text-sm">Welcome, <span class="font-semibold">{{ username }}</span></li>
+                    <li><a href="/account" class="hover:text-green-400 transition duration-300 font-medium">My Account</a></li>
+                    <li><a href="/logout" class="hover:text-green-400 transition duration-300 font-medium">Logout</a></li>
+                    {% else %}
+                    <li><a href="/login" class="hover:text-green-400 transition duration-300 font-medium">Login</a></li>
+                    <li><a href="/register" class="hover:text-green-400 transition duration-300 font-medium">Register</a></li>
+                    {% endif %}
+                    <li><a href="/help" class="hover:text-green-400 transition duration-300 font-medium">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-4 animate-fadeIn">
+                    {% for category, message in messages %}
+                        <div class="p-3 rounded-md text-sm {% if category == 'error' %}bg-red-100 text-red-700{% elif category == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="bg-white p-8 rounded-xl shadow-lg animate-slideInUp">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Welcome, {{ username if username else 'Guest' }}!</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 animate-slideInUp animate-slideInUp-delay-1">
+                <div class="info-card-green p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-semibold text-green-800 mb-2">Total CO2 Saved</h3>
+                    <p class="text-5xl font-bold text-green-700" id="co2SavedCounter">{{ '%.2f' | format(total_co2_saved) }}</p>
+                    <p class="text-sm text-green-700">kg by choosing greener journeys</p>
+                </div>
+                <div class="info-card-blue p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-2">Plan New Journey</h3>
+                    <a href="/" class="text-blue-700 hover:underline text-2xl font-bold block mt-4">Start a new search</a>
+                    <p class="text-sm text-blue-700 mt-1">Find your next sustainable trip.</p>
+                </div>
+                <div class="info-card-yellow p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-semibold text-yellow-800 mb-2">Total Money Saved</h3>
+                    <p class="text-5xl font-bold text-yellow-700" id="moneySavedCounter">£{{ '%.2f' | format(total_money_saved) }}</p>
+                    <p class="text-sm text-yellow-700">on your bookings</p>
+                </div>
+            </div>
+
+            <div class="mb-8 animate-slideInUp animate-slideInUp-delay-2">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Your Upcoming Journeys</h3>
+                {% if upcoming_bookings %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for booking in upcoming_bookings %}
+                        <div class="booking-card border-l-4 border-green-500 animate-fadeIn animate-fadeIn-delay-{{ loop.index }}">
+                            <p class="text-lg font-semibold">{{ booking.origin }} to {{ booking.destination }}</p>
+                            <p class="text-sm text-gray-600">Mode: {{ booking.mode }}</p>
+                            <p class="text-sm text-gray-600">Date: {{ booking.booking_date.strftime('%d %b %Y') }}</p>
+                            <p class="text-sm text-gray-600">Passengers: {{ booking.passengers }}</p>
+                            <p class="text-sm text-gray-600">Total Price: £{{ '%.2f' | format(booking.total_price) }}</p>
+                            <span class="status-badge status-confirmed">Confirmed</span>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <a href="{{ url_for('view_booking_details', transaction_id=booking.transaction_id) }}" class="btn-action btn-action-primary">View Details</a>
+                                <form action="{{ url_for('cancel_booking', transaction_id=booking.transaction_id) }}" method="post" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                    <button type="submit" class="btn-action btn-action-danger">Cancel</button>
+                                </form>
+                                <a href="{{ url_for('modify_booking', transaction_id=booking.transaction_id) }}" class="btn-action btn-action-secondary">Modify</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-600 animate-fadeIn animate-fadeIn-delay-3">You have no upcoming journeys. Start planning your next green trip!</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Your Past Journeys</h3>
+                {% if past_bookings %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for booking in past_bookings %}
+                        <div class="booking-card border-l-4 border-orange-500">
+                            <p class="text-lg font-semibold">{{ booking.origin }} to {{ booking.destination }}</p>
+                            <p class="text-sm text-gray-600">Mode: {{ booking.mode }}</p>
+                            <p class="text-sm text-gray-600">Date: {{ booking.booking_date.strftime('%d %b %Y') }}</p>
+                            <p class="text-sm text-gray-600">Passengers: {{ booking.passengers }}</p>
+                            <p class="text-sm text-gray-600">Total Price: £{{ '%.2f' | format(booking.total_price) }}</p>
+                            {% if booking.payment_status == 'cancelled' %}
+                                <span class="status-badge status-cancelled">Cancelled</span>
+                            {% else %}
+                                <span class="status-badge status-completed">Completed</span>
+                            {% endif %}
+                            <p class="text-green-700 text-sm">Est. CO2: {{ '%.2f' | format(booking.carbon_footprint) }}kg</p>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <a href="{{ url_for('view_booking_details', transaction_id=booking.transaction_id) }}" class="btn-action btn-action-primary">View Details</a>
+                                <a href="{{ url_for('rebook_journey', journey_id=booking.journey_id) }}" class="btn-action btn-action-rebook">Rebook</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-600">You have no past journeys.</p>
+                {% endif %}
+            </div>
+
+            <div class="mt-8 pt-8 border-t border-gray-200">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Profile Settings</h3>
+                <p class="text-gray-600">Manage your personal information and student verification here.</p>
+                <a href="#" class="text-blue-600 hover:underline mt-2 inline-block">Edit Profile (Coming Soon)</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-6 mt-12">
+        <div class="container mx-auto text-center px-4">
+            <p class="text-sm">&copy; 2025 Green Journey Advisor. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Function to animate counter
+        function animateCounter(id, targetValue, prefix = '', suffix = '') {
+            const element = document.getElementById(id);
+            if (!element) return;
+
+            const startValue = parseFloat(element.innerText.replace(prefix, '').replace(suffix, ''));
+            const duration = 1000; // milliseconds
+            let startTime = null;
+
+            function easeOutQuad(t) {
+                return t * (2 - t);
+            }
+
+            function step(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const progress = Math.min((currentTime - startTime) / duration, 1);
+                const easedProgress = easeOutQuad(progress);
+                const currentValue = startValue + (targetValue - startValue) * easedProgress;
+                element.innerText = prefix + currentValue.toFixed(2) + suffix;
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    element.innerText = prefix + targetValue.toFixed(2) + suffix; // Ensure final value is exact
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate CO2 Saved
+            const co2Target = parseFloat("{{ total_co2_saved }}");
+            animateCounter('co2SavedCounter', co2Target, '', 'kg');
+
+            // Animate Money Saved
+            const moneyTarget = parseFloat("{{ total_money_saved }}");
+            animateCounter('moneySavedCounter', moneyTarget, '£', '');
+        });
+    </script>
+</body>
+</html>

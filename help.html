@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - Green Journey Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-fadeIn-delay-1 { animation-delay: 0.1s; }
+        .animate-fadeIn-delay-2 { animation-delay: 0.2s; }
+        .animate-fadeIn-delay-3 { animation-delay: 0.3s; }
+        .animate-fadeIn-delay-4 { animation-delay: 0.4s; }
+        .animate-fadeIn-delay-5 { animation-delay: 0.5s; }
+
+        @keyframes slideInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideInUp {
+            animation: slideInUp 0.7s ease-out forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+    <header class="bg-gray-900 text-white py-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-3xl font-bold text-green-400">Green Journey Advisor</h1>
+            <nav>
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="/" class="hover:text-green-400 transition duration-300 font-medium">Home</a></li>
+                    {% if user_id %}
+                    <li class="text-green-200 text-sm">Welcome, <span class="font-semibold">{{ username }}</span></li>
+                    <li><a href="/account" class="hover:text-green-400 transition duration-300 font-medium">My Account</a></li>
+                    <li><a href="/logout" class="hover:text-green-400 transition duration-300 font-medium">Logout</a></li>
+                    {% else %}
+                    <li><a href="/login" class="hover:text-green-400 transition duration-300 font-medium">Login</a></li>
+                    <li><a href="/register" class="hover:text-green-400 transition duration-300 font-medium">Register</a></li>
+                    {% endif %}
+                    <li><a href="/help" class="hover:text-green-400 transition duration-300 font-medium">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12">
+        <div class="bg-white p-8 rounded-xl shadow-lg animate-slideInUp">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 animate-fadeIn animate-fadeIn-delay-1">Help & Support</h2>
+            <p class="text-gray-600 animate-fadeIn animate-fadeIn-delay-2">Welcome to the Green Journey Advisor help page. Here you can find answers to common questions about planning your sustainable travel.</p>
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3 animate-fadeIn animate-fadeIn-delay-3">Frequently Asked Questions</h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li class="animate-fadeIn animate-fadeIn-delay-4">How do I search for a journey?</li>
+                <li class="animate-fadeIn animate-fadeIn-delay-5">What do the CO2 emissions mean?</li>
+                <li class="animate-fadeIn animate-fadeIn-delay-6">How do student discounts work?</li>
+                <li class="animate-fadeIn animate-fadeIn-delay-7">How can I view my bookings?</li>
+                <li class="animate-fadeIn animate-fadeIn-delay-8">Is my payment information secure?</li>
+            </ul>
+            <p class="mt-6 text-gray-600 animate-fadeIn animate-fadeIn-delay-9">If you can't find what you're looking for, please contact our support team.</p>
+            <p class="mt-2 text-blue-600 animate-fadeIn animate-fadeIn-delay-10">Email: support@greenjourney.com</p>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-6 mt-12">
+        <div class="container mx-auto text-center px-4">
+            <p class="text-sm">&copy; 2025 Green Journey Advisor. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

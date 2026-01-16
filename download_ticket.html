@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Ticket - Green Journey Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .btn-green-download {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-green-download:hover {
+            background-color: #10b981; /* green-600 */
+            transform: translateY(-1px);
+        }
+        #qrcodeCanvas {
+            border: 1px solid #e2e8f0; /* gray-200 */
+            border-radius: 8px;
+            padding: 10px;
+            /* background-color: red !important; Removed diagnostic red background */
+            display: block; /* Ensure it takes full width */
+            margin: 0 auto; /* Center the canvas */
+            /* Explicit width and height are set directly on the <canvas> tag in HTML */
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-fadeIn-delay-1 { animation-delay: 0.1s; }
+        .animate-fadeIn-delay-2 { animation-delay: 0.2s; }
+        .animate-fadeIn-delay-3 { animation-delay: 0.3s; }
+
+        @keyframes slideInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideInUp {
+            animation: slideInUp 0.7s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-popIn {
+            animation: popIn 0.6s ease-out forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+    <header class="bg-gray-900 text-white py-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-3xl font-bold text-green-400">Green Journey Advisor</h1>
+            <nav>
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="/" class="hover:text-green-400 transition duration-300 font-medium">Home</a></li>
+                    {% if user_id %}
+                    <li class="text-green-200 text-sm">Welcome, <span class="font-semibold">{{ username }}</span></li>
+                    <li><a href="/account" class="hover:text-green-400 transition duration-300 font-medium">My Account</a></li>
+                    <li><a href="/logout" class="hover:text-green-400 transition duration-300 font-medium">Logout</a></li>
+                    {% else %}
+                    <li><a href="/login" class="hover:text-green-400 transition duration-300 font-medium">Login</a></li>
+                    <li><a href="/register" class="hover:text-green-400 transition duration-300 font-medium">Register</a></li>
+                    {% endif %}
+                    <li><a href="/help" class="hover:text-green-400 transition duration-300 font-medium">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12 flex justify-center items-center min-h-[calc(100vh-150px)]">
+        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl text-center animate-slideInUp">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 animate-fadeIn animate-fadeIn-delay-1">Your E-Ticket</h2>
+            
+            {% if booking %}
+            <div class="bg-green-50 p-6 rounded-lg shadow-inner text-left mb-8 border-l-4 border-green-400 animate-fadeIn animate-fadeIn-delay-2">
+                <p class="text-lg font-bold text-gray-800 mb-2">Booking Reference: <span class="text-green-600">{{ booking.transaction_id }}</span></p>
+                <p class="text-gray-700 mb-1">Route: <span class="font-medium">{{ booking.origin }} to {{ booking.destination }}</span></p>
+                <p class="text-gray-700 mb-1">Departure Date: <span class="font-medium">{{ booking.booking_date.strftime('%d %b %Y') }}</span></p>
+                {% if booking.journey_type == 'return' %}
+                <p class="text-gray-700 mb-1">Return Journey: <span class="font-medium">Yes</span></p>
+                {% endif %}
+                <p class="text-gray-700 mb-1">Passengers: <span class="font-medium">{{ booking.passengers }}</span></p>
+                <p class="text-gray-700 mb-1">Total Price: <span class="font-medium">£{{ '%.2f' | format(booking.total_price) }}</span></p>
+                <p class="text-gray-700 mb-1">Mode: <span class="font-medium">{{ booking.mode }}</span></p>
+            </div>
+
+            <p class="text-lg text-gray-600 mb-8 animate-fadeIn animate-fadeIn-delay-3">
+                Scan the QR code below for your journey details.
+            </p>
+            
+            <div class="flex justify-center mb-8 animate-popIn animate-fadeIn-delay-4">
+                {# Canvas element with explicit width and height attributes #}
+                <canvas id="qrcodeCanvas" width="256" height="256"></canvas>
+            </div>
+
+            <button id="downloadQrButton" class="btn-green-download animate-fadeIn animate-fadeIn-delay-5">
+                Download QR Code
+            </button>
+            <p class="text-sm text-gray-500 mt-4 animate-fadeIn animate-fadeIn-delay-6">(QR code encodes your booking reference: {{ booking.transaction_id }})</p>
+            {% else %}
+            <p class="text-lg text-gray-600 mb-8 animate-fadeIn animate-fadeIn-delay-2">Ticket details not found. Please ensure you have a valid booking.</p>
+            {% endif %}
+
+            <div class="text-center mt-8 pt-8 border-t border-gray-200 animate-fadeIn animate-fadeIn-delay-7">
+                <a href="/account"
+                   class="bg-gray-300 text-gray-800 py-2 px-5 rounded-lg font-semibold hover:bg-gray-400 transition duration-300">
+                    Back to My Account
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-6 mt-12">
+        <div class="container mx-auto text-center px-4">
+            <p class="text-sm">&copy; 2025 Green Journey Advisor. All rights reserved.</p>
+        </div>
+    </footer>
+
+    {# IMPORTANT: Place qrcode.js script AFTER the HTML elements it targets #}
+    {# and BEFORE your custom script that uses it. #}
+    <script src="https://cdn.jsdelivr.net/npm/qrcode.js/qrcode.min.js"></script> 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const booking = {{ booking | tojson }}; 
+            const qrcodeCanvas = document.getElementById('qrcodeCanvas');
+            const downloadQrButton = document.getElementById('downloadQrButton');
+
+            console.log('Booking data:', booking);
+            console.log('Canvas element:', qrcodeCanvas);
+
+            if (booking && booking.transaction_id) {
+                console.log('Transaction ID found:', booking.transaction_id);
+
+                try {
+                    new QRCode(qrcodeCanvas, { 
+                        text: booking.transaction_id,
+                        width: 256, // Fixed width for generation
+                        height: 256, // Fixed height for generation
+                        colorDark : "#000000",
+                        colorLight : "#ffffff", // Set light color to white for better visibility
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+                    console.log('QR Code generation attempted successfully.');
+                } catch (e) {
+                    console.error('Error generating QR Code:', e);
+                }
+
+                // Download QR Code functionality
+                downloadQrButton.addEventListener('click', function() {
+                    try {
+                        // Ensure the background is white for the downloaded image
+                        const originalBg = qrcodeCanvas.style.backgroundColor;
+                        qrcodeCanvas.style.backgroundColor = 'white'; 
+                        const dataURL = qrcodeCanvas.toDataURL("image/png");
+                        qrcodeCanvas.style.backgroundColor = originalBg; // Revert background
+                        
+                        const a = document.createElement('a');
+                        a.href = dataURL;
+                        a.download = `ticket_qr_${booking.transaction_id}.png`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        console.log('QR Code download initiated.');
+                    } catch (e) {
+                        console.error('Error downloading QR Code:', e);
+                        // Using console.error instead of alert as per instructions
+                        console.error('Could not download QR code. Please check console for errors.'); 
+                    }
+                });
+            } else {
+                console.warn('Booking data or transaction_id is missing, cannot generate QR code.');
+                if (qrcodeCanvas) {
+                    qrcodeCanvas.style.display = 'none'; // Hide canvas if no data
+                }
+                if (downloadQrButton) {
+                    downloadQrButton.style.display = 'none'; // Hide button if no data
+                }
+            }
+        });
+    </script>
+</body>
+</html>

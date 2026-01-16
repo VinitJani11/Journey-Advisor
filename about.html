@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Green Journey Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Animations */
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-fadeInScale {
+            animation: fadeInScale 0.8s ease-out forwards;
+            opacity: 0; /* Start hidden */
+        }
+        .animate-fadeInScale:nth-child(1) { animation-delay: 0.2s; }
+        .animate-fadeInScale:nth-child(2) { animation-delay: 0.4s; }
+        .animate-fadeInScale:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes slideInLeft {
+            0% { opacity: 0; transform: translateX(-50px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        .animate-slideInLeft {
+            animation: slideInLeft 0.7s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideInRight {
+            0% { opacity: 0; transform: translateX(50px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        .animate-slideInRight {
+            animation: slideInRight 0.7s ease-out forwards;
+            opacity: 0;
+        }
+
+        /* General Fade In for content sections */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-fadeIn-delay-1 { animation-delay: 0.1s; }
+        .animate-fadeIn-delay-2 { animation-delay: 0.2s; }
+        .animate-fadeIn-delay-3 { animation-delay: 0.3s; }
+        .animate-fadeIn-delay-4 { animation-delay: 0.4s; }
+        .animate-fadeIn-delay-5 { animation-delay: 0.5s; }
+
+        /* Hamburger menu icon animation (copied for consistency) */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            z-index: 50; /* Ensure it's above other content */
+        }
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            border-radius: 2px;
+            transition: all 0.3s ease-in-out;
+        }
+        .hamburger.open span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.open span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        /* Mobile menu overlay (copied for consistency) */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 40;
+            display: none; /* Hidden by default */
+        }
+
+        /* Mobile menu sidebar (copied for consistency) */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px; /* Start off-screen */
+            width: 250px;
+            height: 100%;
+            background-color: #2c3e50; /* Dark blue */
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+            z-index: 45;
+            transition: right 0.3s ease-in-out;
+            padding-top: 60px; /* Space for header */
+        }
+        .mobile-menu.open {
+            right: 0; /* Slide in */
+        }
+        .mobile-menu ul li a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+        .mobile-menu ul li a:hover {
+            background-color: #34495e; /* Darker blue on hover */
+        }
+        .mobile-menu ul li.welcome-text {
+            padding: 15px 20px;
+            color: #d1d5db; /* Light gray */
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+
+        /* Desktop navigation (copied for consistency) */
+        @media (min-width: 768px) {
+            .hamburger {
+                display: none; /* Hide hamburger on desktop */
+            }
+            .desktop-nav {
+                display: flex !important; /* Always show desktop nav */
+            }
+            .mobile-menu-overlay, .mobile-menu {
+                display: none !important; /* Hide mobile menu elements */
+            }
+        }
+        @media (max-width: 767px) {
+            .desktop-nav {
+                display: none; /* Hide desktop nav on mobile */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+    <header class="bg-gray-900 text-white py-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-3xl font-bold text-green-400">Green Journey Advisor</h1>
+            
+            <!-- Desktop Navigation -->
+            <nav class="desktop-nav hidden md:flex">
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="/" class="hover:text-green-400 transition duration-300 font-medium">Home</a></li>
+                    <li><a href="/about" class="hover:text-green-400 transition duration-300 font-medium">About Us</a></li>
+                    <li><a href="/why_us" class="hover:text-green-400 transition duration-300 font-medium">Why Us</a></li>
+                    <li><a href="/help" class="hover:text-green-400 transition duration-300 font-medium">Help</a></li>
+                    {% if user_id %}
+                    <li class="text-green-200 text-sm">Welcome, <span class="font-semibold">{{ username }}</span></li>
+                    <li><a href="/account" class="hover:text-green-400 transition duration-300 font-medium">My Account</a></li>
+                    <li><a href="/logout" class="hover:text-green-400 transition duration-300 font-medium">Logout</a></li>
+                    {% else %}
+                    <li><a href="/login" class="hover:text-green-400 transition duration-300 font-medium">Login</a></li>
+                    <li><a href="/register" class="hover:text-green-400 transition duration-300 font-medium">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+            <!-- Hamburger Icon for Mobile -->
+            <div class="md:hidden flex items-center">
+                <button id="hamburgerButton" class="hamburger focus:outline-none">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
+
+    <!-- Mobile Menu Sidebar -->
+    <div id="mobileMenu" class="mobile-menu">
+        <ul>
+            {# Mobile menu now only contains user-specific links (if logged in) or login/register #}
+            {# General navigation links removed from mobile menu as per user request #}
+            {# This section is intentionally left empty of general navigation links for these specific pages #}
+            {% if user_id %}
+            <li class="welcome-text">Welcome, {{ username }}</li>
+            <li><a href="/account">My Account</a></li>
+            <li><a href="/logout">Logout</a></li>
+            {% else %}
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+            {% endif %}
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/why_us">Why Us</a></li>
+            <li><a href="/help">Help</a></li>
+        </ul>
+    </div>
+
+    <main class="container mx-auto px-4 py-12">
+        <div class="bg-white p-8 rounded-xl shadow-lg animate-fadeInScale">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 animate-slideInLeft">About Green Journey Advisor</h2>
+            <p class="text-gray-600 mb-4 animate-slideInRight" style="animation-delay: 0.2s;">
+                Welcome to Green Journey Advisor, your trusted partner for sustainable travel across the UK.
+                Our mission is to empower travelers to make eco-conscious choices without compromising on convenience or cost.
+            </p>
+            <p class="text-gray-600 mb-4 animate-slideInLeft" style="animation-delay: 0.4s;">
+                Founded in 2025, we recognized the growing need for accessible and transparent information
+                regarding the environmental impact of travel. We believe that every journey can be a step
+                towards a greener future, and our platform is designed to make that choice easy and rewarding.
+            </p>
+            <p class="text-gray-600 animate-slideInRight" style="animation-delay: 0.6s;">
+                We are committed to providing accurate CO2 emission data, highlighting cost-effective green alternatives,
+                and continuously expanding our network of sustainable transport providers. Join us in making a difference,
+                one journey at a time.
+            </p>
+        </div>
+
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-fadeInScale" style="animation-delay: 0.8s;">
+                <h3 class="text-2xl font-semibold text-green-700 mb-4">Our Vision</h3>
+                <p class="text-gray-600">
+                    To be the leading platform for sustainable travel planning, inspiring millions to choose
+                    environmentally friendly journeys and contribute to a healthier planet.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg animate-fadeInScale" style="animation-delay: 1s;">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Our Values</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-2">
+                    <li>Sustainability at Core</li>
+                    <li>Transparency & Accuracy</li>
+                    <li>User-Centric Design</li>
+                    <li>Innovation & Growth</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-6 mt-12">
+        <div class="container mx-auto text-center px-4">
+            <p class="text-sm">&copy; 2025 Green Journey Advisor. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle functionality (copied from index.html for consistency)
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerButton = document.getElementById('hamburgerButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+
+            hamburgerButton.addEventListener('click', function() {
+                hamburgerButton.classList.toggle('open');
+                mobileMenu.classList.toggle('open');
+                mobileMenuOverlay.classList.toggle('hidden');
+            });
+
+            mobileMenuOverlay.addEventListener('click', function() {
+                hamburgerButton.classList.remove('open');
+                mobileMenu.classList.remove('open');
+                mobileMenuOverlay.classList.add('hidden');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburgerButton.classList.remove('open');
+                    mobileMenu.classList.remove('open');
+                    mobileMenuOverlay.classList.add('hidden');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

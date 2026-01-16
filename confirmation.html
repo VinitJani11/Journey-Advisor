@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed! - Green Journey Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .btn-gradient-blue {
+            background-image: linear-gradient(to right, #3b82f6, #2563eb); /* Blue to darker blue */
+        }
+        .btn-gradient-blue:hover {
+            background-image: linear-gradient(to right, #2563eb, #3b82f6); /* Reverse gradient on hover */
+        }
+        .btn-gray {
+            background-color: #d1d5db; /* Gray */
+        }
+        .btn-gray:hover {
+            background-color: #9ca3af; /* Darker gray */
+        }
+
+        /* Animation for the checkmark */
+        @keyframes bounce-in {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .animate-bounce-in {
+            animation: bounce-in 0.8s ease-out forwards;
+        }
+
+        /* Subtle background animation */
+        @keyframes flow-bg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .flowing-background {
+            background: linear-gradient(-45deg, #e0ffe0, #d0f0d0, #c0e0c0, #b0d0b0);
+            background-size: 400% 400%;
+            animation: flow-bg 15s ease infinite;
+        }
+
+        /* General Fade In for content sections */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-fadeIn-delay-1 { animation-delay: 0.1s; }
+        .animate-fadeIn-delay-2 { animation-delay: 0.2s; }
+        .animate-fadeIn-delay-3 { animation-delay: 0.3s; }
+        .animate-fadeIn-delay-4 { animation-delay: 0.4s; }
+        .animate-fadeIn-delay-5 { animation-delay: 0.5s; }
+
+        @keyframes slideInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideInUp {
+            animation: slideInUp 0.7s ease-out forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased flowing-background">
+    <header class="bg-gray-900 text-white py-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-3xl font-bold text-green-400">Green Journey Advisor</h1>
+            <nav>
+                <ul class="flex space-x-6 items-center">
+                    <li><a href="/" class="hover:text-green-400 transition duration-300 font-medium">Home</a></li>
+                    {% if user_id %}
+                    <li class="text-green-200 text-sm">Welcome, <span class="font-semibold">{{ username }}</span></li>
+                    <li><a href="/account" class="hover:text-green-400 transition duration-300 font-medium">My Account</a></li>
+                    <li><a href="/logout" class="hover:text-green-400 transition duration-300 font-medium">Logout</a></li>
+                    {% else %}
+                    <li><a href="/login" class="hover:text-green-400 transition duration-300 font-medium">Login</a></li>
+                    <li><a href="/register" class="hover:text-green-400 transition duration-300 font-medium">Register</a></li>
+                    {% endif %}
+                    <li><a href="/help" class="hover:text-green-400 transition duration-300 font-medium">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12 flex justify-center items-center min-h-[calc(100vh-150px)]">
+        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl text-center border-t-8 border-green-500 animate-slideInUp">
+            <div class="text-green-500 text-7xl mb-6 animate-bounce-in">✅</div>
+            <h2 class="text-4xl font-bold text-green-700 mb-4 animate-fadeIn animate-fadeIn-delay-1">Booking Confirmed!</h2>
+            <p class="text-xl text-gray-700 mb-8 animate-fadeIn animate-fadeIn-delay-2">Your Green Journey Awaits!</p>
+
+            {% if booking %}
+            <div class="bg-blue-50 p-6 rounded-lg shadow-inner text-left mb-8 border-l-4 border-blue-400 animate-fadeIn animate-fadeIn-delay-3">
+                <h3 class="text-2xl font-semibold text-blue-800 mb-4">Booking Details</h3>
+                <p class="text-lg font-bold text-gray-800 mb-2">Reference: <span class="text-blue-600">{{ booking.transaction_id }}</span></p>
+                <p class="text-gray-700 mb-1">Route: <span class="font-medium">{{ booking.origin }} to {{ booking.destination }}</span></p>
+                <p class="text-gray-700 mb-1">Mode: <span class="font-medium">{{ booking.mode }}</span></p>
+                <p class="text-gray-700 mb-1">Departure Date: <span class="font-medium">{{ booking.booking_date.strftime('%d %b %Y') }}</span></p>
+                <p class="text-gray-700 mb-1">Passengers: <span class="font-medium">{{ booking.passengers }}</span></p>
+                <p class="text-gray-700 mb-1">Total Price: <span class="font-medium">£{{ '%.2f' | format(booking.total_price) }}</span></p>
+                <p class="text-gray-700 mb-1">Est. CO2 Saved (this journey): <span class="font-medium text-green-700">{{ '%.2f' | format(booking.carbon_footprint) }}kg</span></p>
+                <p class="text-gray-700 mb-1">Duration: <span class="font-medium">{{ booking.duration }}</span></p>
+                <p class="text-gray-700 mb-1">Description: <span class="font-medium">{{ booking.journey_description }}</span></p>
+                <p class="text-gray-700 mb-1">Payment Method: <span class="font-medium">{{ booking.payment_method.replace('-', ' ').title() }}</span></p>
+                <p class="text-gray-700 mb-1">Status: <span class="font-medium">{{ booking.payment_status.capitalize() }}</span></p>
+                <p class="text-sm text-gray-500 mt-4">Booked on: {{ booking.booked_at.strftime('%d %b %Y %H:%M') }}</p>
+            </div>
+            {% else %}
+            <p class="text-lg text-gray-600 animate-fadeIn animate-fadeIn-delay-3">Could not retrieve booking details. Please check your account.</p>
+            {% endif %}
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8 animate-fadeIn animate-fadeIn-delay-4">
+                <a href="/account"
+                   class="btn-gradient-blue text-white py-3 px-6 rounded-lg font-semibold text-lg
+                          shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
+                    View My Bookings
+                </a>
+                <a href="/"
+                   class="btn-gray text-gray-800 py-3 px-6 rounded-lg font-semibold text-lg
+                          shadow-md transform hover:scale-105 transition duration-300 ease-in-out">
+                    Plan Another Journey
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-6 mt-12">
+        <div class="container mx-auto text-center px-4">
+            <p class="text-sm">&copy; 2025 Green Journey Advisor. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
